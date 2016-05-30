@@ -16,7 +16,7 @@ begin = time.time()
 # stride and patch_width
 stride = 1
 patch_width = [1]
-height = 28 * np.sum(patch_width)
+height = 40 * np.sum(patch_width)
 batch_size = 64
 
 # loading data
@@ -36,8 +36,8 @@ y_clip = T.ivector('y_clip')
 # shared cellar
 x_shared = theano.shared(np.zeros((batch_size, 1, 10, 10)).astype(theano.config.floatX))
 x_mask_shared = theano.shared(np.zeros((10, 10)).astype(theano.config.floatX))
-y_shared = theano.shared(np.zeros((10, 50)).astype('int32'))
-y_clip_shared = theano.shared(np.zeros(50).astype('int32'))
+y_shared = theano.shared(np.zeros((10, 200)).astype('int32'))
+y_clip_shared = theano.shared(np.zeros(200).astype('int32'))
 
 
 # setting parameters
@@ -66,7 +66,7 @@ options['n_in_lstm_layer'] = height
 options['n_out_lstm_layer'] = lstm_hidden_units
 options['n_out_hidden_layer'] = n_classes + 1 # additional class blank
 options['blank'] = n_classes
-options['labels_len'] = 50
+options['labels_len'] = 200
 options['batch_size'] = batch_size
 
 # build the model
@@ -132,6 +132,7 @@ for epoch in range(start_epoch + 1, n_epochs):
             learning_rate.set_value(np.float32(old_lr * alpha))
             print(".change learning rate from {} to {}".format(old_lr, learning_rate.get_value()))
         x_slice, x_mask_slice, y_slice, y_clip_slice = training_data_prefetcher.fetch_next(True)
+        print x_slice.shape, x_mask_slice.shape, y_slice.shape, y_clip_slice.shape
         x_shared.set_value(x_slice)
         x_mask_shared.set_value(x_mask_slice)
         y_shared.set_value(y_slice)

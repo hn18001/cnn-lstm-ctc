@@ -29,7 +29,7 @@ def parse_bbox(image_full_path, text_path):
                 word = word - ord(chars[0]);
 
                 # process image
-                img = cv2.imread(image_full_path)
+                img = cv2.imread(image_full_path, 0)
                 new_width = int(height_std / img.shape[0] * img.shape[1])
                 sub = cv2.resize(img, (new_width, int(height_std)))
 
@@ -57,8 +57,6 @@ if __name__ == "__main__":
                 print("processing {}({}/{})".format(file, i + 1, len(files)))
                 image_full_path = os.path.join(root, file)
                 box_full_path = os.path.join(boxes_dir, file[0:-4] + '.gt.txt')
-                #im = cv2.imread(image_full_path);
-                #im_grey = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY).astype(np.float)
                 features, labels = parse_bbox(image_full_path, box_full_path)
                 labels_all.extend(labels)
                 features_all.extend(features)

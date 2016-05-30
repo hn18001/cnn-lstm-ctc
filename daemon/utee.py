@@ -11,7 +11,7 @@ import re
 import cv2
 
 def parse_bbox(im, text_path):
-    height_std = 28.0
+    height_std = 40.0
     chars = set([chr(x) for x in range(32, 127)])
     labels = []
     features = []
@@ -116,7 +116,7 @@ class Prefetcher():
                 self.idxs = np.random.permutation(self.n_samples)
             img_path = self.img_list[self.idxs[self.cur]]
             full_img_path = os.path.join(self.imgs_dirs, img_path)
-            im = cv2.imread(full_img_path, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            im = cv2.imread(full_img_path, 0)
             features.append(im / 255.)
             labels.append(self.labels[self.idxs[self.cur]])
             self.cur += 1
@@ -126,7 +126,7 @@ class Prefetcher():
     def _wrap(self, features, labels, batch_size, stride, patch_width, n_classes, is_shared, is_blank_y):
         # packing
         x_max_len = np.max([x.shape[1] for x in features])
-        y_max_len = 50 # pre-difine
+        y_max_len = 200 # pre-difine
         height = features[0].shape[0]
 
         # transform
@@ -155,15 +155,19 @@ class Prefetcher():
         # y and y_clip
         y = np.zeros((batch_size, y_max_len)).astype('int32')
         y_clip = np.zeros((batch_size)).astype('int32')
+        print "test..."
         if is_blank_y:
             for i, yy in enumerate(labels):
                 y_extend = np.ones(2 * len(yy) + 1, dtype='int32') * n_classes
+                print yy.shape
                 for j in range(len(yy)):
                     y_extend[2 * j + 1] = yy[j]
                 y[i, :len(y_extend)] = y_extend
                 y_clip[i] = len(y_extend)
         else:
             for i, yy in enumerate(labels):
+                print y[i, :len(yy)]
+                print yy
                 y[i, :len(yy)] = yy;
                 y_clip[i] = len(yy)
 

@@ -10,7 +10,7 @@ reg.init("99.pkl")
 
 imgs = []
 for i in range(100):
-    im = cv2.imread('/share/data_for_BLSTM_CTC/Samples_for_English/20151205/imgs/{}.jpg'.format(i + 1))
+    im = cv2.imread('/share/data_for_BLSTM_CTC/Samples_for_English/20151205/imgs/{}.jpg'.format(i + 1), 0)
     im_grey = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255.
     imgs.append(im_grey)
 

@@ -23,7 +23,7 @@ class Recognition():
         # setting parameters
         print("setting parameters({})".format(time.time() - tic))
         lstm_hidden_units = 90
-        self.height_raw = 28 # original fixed height of image
+        self.height_raw = 40 # original fixed height of image
         self.height = self.height_raw * np.sum(self.patch_width)
         n_classes = len(self.chars)
 
@@ -33,7 +33,7 @@ class Recognition():
         options['n_out_lstm_layer'] = lstm_hidden_units
         options['n_out_hidden_layer'] = n_classes + 1 # additional class blank
         options['blank'] = n_classes
-        options['labels_len'] = 50
+        options['labels_len'] = 200
         options['batch_size'] = self.batch_size
         options['n_classes'] = n_classes
         print(options)
@@ -68,7 +68,7 @@ class Recognition():
         for img in imgs:
             assert len(img) == self.height_raw
             x_max_len = max(len(img[0]), x_max_len)
-        y_max_len = 50 # pre-difine
+        y_max_len = 200 # pre-difine
         x_max_len = np.ceil(x_max_len * 1. / self.stride)
         print("[pack image]height: {}, x_max_step:{}, y_max_width:{}".format(self.height, x_max_len, y_max_len))
 

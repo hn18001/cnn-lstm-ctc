@@ -11,7 +11,7 @@ import re
 import cv2
 
 def parse_bbox(im, text_path):
-    height_std = 28.0
+    height_std = 40.0
     chars = set([chr(x) for x in range(32, 127)])
     labels = []
     features = []
@@ -115,7 +115,7 @@ class Prefetcher():
                 self.idxs = np.random.permutation(self.n_samples)
             img_path = self.img_list[self.idxs[self.cur]]
             full_img_path = os.path.join(self.imgs_dirs, img_path)
-            im = cv2.imread(full_img_path, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            im = cv2.imread(full_img_path, 0)
             features.append(im / 255.)
             labels.append(self.labels[self.idxs[self.cur]])
             self.cur += 1
@@ -125,9 +125,10 @@ class Prefetcher():
     def _wrap(self, features, labels, batch_size, stride, patch_width, n_classes, is_shared, is_blank_y):
         # packing
         x_max_len = np.max([x.shape[1] for x in features])
-        y_max_len = 50 # pre-difine
+        y_max_len = 200 # pre-difine
         height = features[0].shape[0]
 
+        print "y_max_len:", y_max_len
         # transform
         x_max_len = np.ceil(x_max_len * 1. / stride)
         height = height * np.sum(patch_width)
