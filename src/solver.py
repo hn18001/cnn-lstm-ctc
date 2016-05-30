@@ -20,9 +20,9 @@ height = 28 * np.sum(patch_width)
 batch_size = 64
 
 # loading data
-imgs_dir = '/share/data_for_BLSTM_CTC/Samples_for_English/20151205/imgs/'
-train_img_list = '/share/data_for_BLSTM_CTC/Samples_for_English/20151205/train_img_list.txt'
-test_img_list = '/share/data_for_BLSTM_CTC/Samples_for_English/20151205/test_img_list.txt'
+imgs_dir = '../tools/imgs/'
+train_img_list = '../tools//train_img_list.txt'
+test_img_list = '../tools/test_img_list.txt'
 training_data_prefetcher = Prefetcher(train_img_list, imgs_dir, batch_size, stride, patch_width)
 testing_data_prefetcher = Prefetcher(test_img_list, imgs_dir, batch_size, stride, patch_width)
 

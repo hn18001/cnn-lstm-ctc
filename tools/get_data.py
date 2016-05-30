@@ -5,33 +5,33 @@ import cv2
 import os
 import re
 
-height_std = 28.0
+height_std = 40.0
 chars = [chr(x) for x in range(32, 127)]
 
-def parse_bbox(im, text_path):
+def parse_bbox(image_full_path, text_path):
+    print image_full_path, text_path
     labels = []
     features = []
     with open(text_path, 'r')  as f:
         for line in f.readlines():
             try:
-                candidates = re.findall('\[.+?\]', line)
+                word = line.split('\n')[0]
+                print word
 
                 # process word
-                word = candidates[1][1:-1]
                 word = np.array([ord(c) for c in word])
                 if np.max(word) > ord(chars[-1]) or np.min(word) < ord(chars[0]):
+                    print np.min(word), np.max(word), ord(chars[0]), ord(chars[-1])
+                    print "Invalid chars"
                     continue
+                else:
+                    print "Valid chars"
                 word = word - ord(chars[0]);
 
-                # process cords
-                cords = candidates[2][1:-1].split(',')
-                up = int(cords[0])
-                down = int(cords[1]) + 1
-                left = int(cords[2])
-                right = int(cords[3]) + 1
-                sub = im[up:down, left:right]
-                new_width = int(height_std / sub.shape[0] * sub.shape[1])
-                sub = cv2.resize(sub, (new_width, int(height_std)))
+                # process image
+                img = cv2.imread(image_full_path)
+                new_width = int(height_std / img.shape[0] * img.shape[1])
+                sub = cv2.resize(img, (new_width, int(height_std)))
 
                 features.append(sub)
                 labels.append(word.tolist())
@@ -41,8 +41,10 @@ def parse_bbox(im, text_path):
     return features, labels
 
 if __name__ == "__main__":
-    images_dir = os.path.expanduser('./images/')
-    boxes_dir = os.path.expanduser("./trans/")
+    images_dir = os.path.expanduser('~/GitHub/clstm/IAM/clstm_data/')
+    boxes_dir = os.path.expanduser("~/GitHub/clstm/IAM/clstm_data/")
+    #images_dir  = os.path.expanduser('./test/')
+    #boxes_dir = os.path.expanduser('./test/')
     out_imgs_dir = os.path.expanduser('./imgs/')
     out_train_imgs_list_path = os.path.expanduser('./train_img_list.txt')
     out_test_imgs_list_path = os.path.expanduser('./test_img_list.txt')
@@ -51,13 +53,13 @@ if __name__ == "__main__":
     labels_all = []
     for root, dirs, files in os.walk(images_dir):
         for i, file in enumerate(files):
-            if file.endswith('.jpg'):
+            if file.endswith('.png'):
                 print("processing {}({}/{})".format(file, i + 1, len(files)))
                 image_full_path = os.path.join(root, file)
-                box_full_path = os.path.join(boxes_dir, file[0:-4] + '.box')
-                im = cv2.imread(image_full_path);
-                im_grey = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY).astype(np.float)
-                features, labels = parse_bbox(im_grey, box_full_path)
+                box_full_path = os.path.join(boxes_dir, file[0:-4] + '.gt.txt')
+                #im = cv2.imread(image_full_path);
+                #im_grey = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY).astype(np.float)
+                features, labels = parse_bbox(image_full_path, box_full_path)
                 labels_all.extend(labels)
                 features_all.extend(features)
 
@@ -76,6 +78,7 @@ if __name__ == "__main__":
             img_save_full_path = os.path.join(out_imgs_dir, img_save_path)
             cv2.imwrite(img_save_full_path, features_all[idx])
             labels_str = [str(c) for c in labels_all[idx]]
+            print labels_str
             record = img_save_path + " " + " ".join(labels_str) + "\n"
             f.write(record)
 
